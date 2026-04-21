@@ -4,14 +4,16 @@ def text_editor(text = ""):
         action = input("Enter action (type/undo/delete/exit): ").lower().strip()
         if action == "type":
             new_text = input("Enter a text: ")
-            text = text + new_text
+            text += new_text
             stack.append(text)
-
         elif action == "delete":
             try:
                 k = int(input("Enter number of characters to delete: "))
-                text = text[:-k]
-                stack.append(text)
+                if k < 1 and k > len(text):
+                    print("Invalid number of characters to delete.")
+                else:
+                    text = text[:-k]
+                    stack.append(text)
             except:
                 print("Please enter a valid number.")
         elif action == "print":
@@ -23,9 +25,8 @@ def text_editor(text = ""):
                 print("Last action undone.")
             else:
                 print("Nothing left to undo!")
-
         elif action == "exit":
-            break     
+            break
         else:
             print("Invalid action.")
 text_editor()
