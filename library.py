@@ -1,45 +1,47 @@
 import csv
+books = []
+with open("books_list.csv", mode="r") as f:
+    for row in csv.DictReader(f):
+        books.append({"Title": row["Title"], "Author": row["Author"], "Status": "available"})
 
-def get_books():
-    books = []
-    try:
-        with open("books_list.csv", mode="r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                books.append({
-                    "Title": row["Title"].lower(), 
-                    "Author": row["Author"],
-                    "Status": "available"
-                })
-    except FileNotFoundError:
-        print("Error: The file books_list.csv was not found.")
-    return books
-def borrow_book(books, title):
-    title = title.lower()
-    for book in books:
-        if book["Title"] == title:
-            if book["Status"] == "available":
-                book["Status"] = "borrowed"
-                print(f"Success: You have borrowed '{title.title()}'.")
-                return
-            else:
-                print(f"Error: '{title.title()}' is already borrowed.")
-                return
-    print(f"Error: '{title.title()}' not found in our library.")
+while True:
+    user_input = input("[Search/Borrow/Return/Exit]: ").strip().lower()
+    
+    if user_input == 'exit':
+        break
+        
+    if user_input in ['search', 'borrow', 'return']:
+        query = input("Enter title or author: ").lower()
+        matches = [b for b in books if query in b['Title'].lower() or query in b['Author'].lower()]
+        
+        if not matches:
+            print("No matches found.")
+            continue
 
-def return_book(books, title):
-    title = title.lower()
-    for book in books:
-        if book["Title"] == title:
-            if book["Status"] == "borrowed":
-                book["Status"] = "available"
-                print(f"Success: You have returned '{title.title()}'.")
-                return
-            else:
-                print(f"Note: '{title.title()}' was already in the library.")
-                return
-    print(f"Error: '{title.title()}' does not belong to this library.")
-my_library = get_books()
-borrow_book(my_library, "the great gatsby")
-borrow_book(my_library, "the great gatsby")
-return_book(my_library, "the great gatsby")
+        for i, b in enumerate(matches, 1):
+            print(f"{i}) {b['Title']} - {b['Author']} [{b['Status']}]")
+        
+        if user_input == 'search':
+            continue
+
+        try:
+            idx = int(input(f"Number to {user_input}: ")) - 1
+            book = matches[idx]
+            
+            if user_input == 'borrow':
+                if book['Status'] == 'available':
+                    book['Status'] = 'borrowed'
+                    print(f"Done. Borrowed '{book['Title']}'.")
+                else:
+                    print("Already out.")
+            
+            elif user_input == 'return':
+                if book['Status'] == 'borrowed':
+                    book['Status'] = 'available'
+                    print(f"Done. '{book['Title']}' is back.")
+                else:
+                    print("Not currently borrowed.")
+        except:
+            print("Invalid selection.")
+    else:
+        print("Unknown command.")
